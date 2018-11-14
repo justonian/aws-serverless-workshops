@@ -50,7 +50,21 @@ class MainApp extends React.Component {
    * @param {Number} longitude
    */
   async getData(pin) {
-    throw new Error('Request a Ride is not implemented');
+    Amplify.Logger.LOG_LEVEL = 'DEBUG';
+    const apiRequest = {
+      body: {
+        PickupLocation: {
+          Longitude: pin.longitude,
+          Latitude: pin.latitude
+        }
+      },
+      headers: {
+        'Authorization': this.state.idToken,
+        'Content-Type': 'application/json'
+      }
+    };
+    logger.info('API Request:', apiRequest);
+    return await API.post(apiName, apiPath, apiRequest);
   }
 
   /**
@@ -59,8 +73,8 @@ class MainApp extends React.Component {
    * @return {Boolean} true if API is configured
    */
   hasApi() {
-    // const api = awsConfig.API.endpoints.filter(v => v.endpoint !== '');                                                   
-    // return (typeof api !== 'undefined');
+    const api = awsConfig.API.endpoints.filter(v => v.endpoint !== '');                                                   
+    return (typeof api !== 'undefined');
   }
 
   /**

@@ -55,23 +55,44 @@ class SignUp extends React.Component {
     this.setState({ code: e.target.value });
   }
 
-  onSubmitForm(e) {
+  async onSubmitForm(e) {
     e.preventDefault();
-    console.log('Form Submitted');
+    try {
+    const params = {
+        username: this.state.email.replace(/[@.]/g, '|'),
+        password: this.state.password,
+        attributes: {
+        email: this.state.email,
+        phone_number: this.state.phone
+        },
+        validationData: []
+    };
+    const data = await Auth.signUp(params);
+    console.log(data);
     this.setState({ stage: 1 });
-  }
+    } catch (err) {
+    alert(err.message);
+    console.error("Exception from Auth.signUp: ", err);
+    this.setState({ stage: 0, email: '', password: '', confirm: '' });
+    }
+}
 
-  onSubmitVerification(e) {
+async onSubmitVerification(e) {
     e.preventDefault();
-    console.log('Verification Submitted');
-    this.setState({ 
-      stage: 0, code: '',
-      email: '', phone: '', 
-      password: '', confirm: ''
-    });
-    // Go back to the home page
-    this.props.history.replace('/');
-  }
+    try {
+    const data = await Auth.confirmSignUp(
+        this.state.email.replace(/[@.]/g, '|'),
+        this.state.code
+    );
+    console.log(data);
+    // Go to the sign in page
+    this.props.history.replace('/signin');
+    } catch (err) {
+    alert(err.message);
+    console.error("Exception from Auth.confirmSignUp: ", err);
+    this.setState({ stage: 0, email: '', password: '', confirm: '', code: '' });
+    }
+}
 
   isValidEmail(email) {
     var re = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
