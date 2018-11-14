@@ -58,46 +58,46 @@ class SignUp extends React.Component {
   async onSubmitForm(e) {
     e.preventDefault();
     try {
-    const params = {
-        username: this.state.email.replace(/[@.]/g, '|'),
-        password: this.state.password,
-        attributes: {
-        email: this.state.email,
-        phone_number: this.state.phone
-        },
-        validationData: []
-    };
-    const data = await Auth.signUp(params);
-    console.log(data);
-    this.setState({ stage: 1 });
+      const params = {
+          username: this.state.email.replace(/[@.]/g, '|'),
+          password: this.state.password,
+          attributes: {
+          email: this.state.email,
+          phone_number: this.state.phone
+          },
+          validationData: []
+      };
+      const data = await Auth.signUp(params);
+      console.log(data);
+      this.setState({ stage: 1 });
     } catch (err) {
-      if (err.message === "User already exists") {
-        // Setting state to allow user to proceed to enter verification code
-        this.setState({ stage: 1 });
-      } else {
-        if (err.message.indexOf("phone number format") >= 0) {err.message = "Invalid phone number format. Must include country code. Example: +14252345678"}
-        alert(err.message);
-        console.error("Exception from Auth.signUp: ", err);
-        this.setState({ stage: 0, email: '', password: '', confirm: '' });
-      }
+        if (err.message === "User already exists") {
+          // Setting state to allow user to proceed to enter verification code
+          this.setState({ stage: 1 });
+        } else {
+          if (err.message.indexOf("phone number format") >= 0) {err.message = "Invalid phone number format. Must include country code. Example: +14252345678"}
+          alert(err.message);
+          console.error("Exception from Auth.signUp: ", err);
+          this.setState({ stage: 0, email: '', password: '', confirm: '' });
+        }
     }
-}
+  }
 
-async onSubmitVerification(e) {
-    e.preventDefault();
-    try {
-    const data = await Auth.confirmSignUp(
-        this.state.email.replace(/[@.]/g, '|'),
-        this.state.code
-    );
-    console.log(data);
-    // Go to the sign in page
-    this.props.history.replace('/signin');
-    } catch (err) {
-    alert(err.message);
-    console.error("Exception from Auth.confirmSignUp: ", err);
-    }
-}
+  async onSubmitVerification(e) {
+      e.preventDefault();
+      try {
+      const data = await Auth.confirmSignUp(
+          this.state.email.replace(/[@.]/g, '|'),
+          this.state.code
+      );
+      console.log(data);
+      // Go to the sign in page
+      this.props.history.replace('/signin');
+      } catch (err) {
+      alert(err.message);
+      console.error("Exception from Auth.confirmSignUp: ", err);
+      }
+  }
 
   isValidEmail(email) {
     var re = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
