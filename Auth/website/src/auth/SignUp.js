@@ -71,6 +71,9 @@ class SignUp extends React.Component {
     console.log(data);
     this.setState({ stage: 1 });
     } catch (err) {
+    if (err.message.indexOf("phone number format") >= 0) {
+      err.message = "Invalid phone number format. Must include country code. Example: +14252345678"
+    }
     alert(err.message);
     console.error("Exception from Auth.signUp: ", err);
     this.setState({ stage: 0, email: '', password: '', confirm: '' });
@@ -90,7 +93,6 @@ async onSubmitVerification(e) {
     } catch (err) {
     alert(err.message);
     console.error("Exception from Auth.confirmSignUp: ", err);
-    this.setState({ stage: 0, email: '', password: '', confirm: '', code: '' });
     }
 }
 
