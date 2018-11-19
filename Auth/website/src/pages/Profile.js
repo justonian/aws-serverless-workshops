@@ -39,14 +39,23 @@ class Profile extends React.Component {
     }
 
     async onImageLoad(url) {
-        console.error('onImageLoad is not yet implemented');
+        if (!this.state.user.getSession) { return };
+        console.log('Profile Picture URL:', url);
+        try {
+            let result = await Auth.updateUserAttributes(this.state.user, {
+                'picture': this.state.image_key
+            });
+            console.log(result);
+        } catch (ex) {
+            console.error('Attribute update error:', ex);
+        }
     }
 
     render() {
       return (<div className="page-unicorns">
         <header className="site-header">
           <div>
-          {/* <S3Image imgKey={this.state.image_key} onLoad={(url) => this.onImageLoad(url)} picker/> */}
+            <S3Image imgKey={this.state.image_key} onLoad={(url) => this.onImageLoad(url)} picker/>
     		<table align="center">
     		<tbody>
              <tr>

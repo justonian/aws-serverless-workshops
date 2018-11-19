@@ -18,8 +18,20 @@ import { BrowserRouter, Redirect, Route, Switch } from 'react-router-dom';
 import { Home, FAQ, Investors, MainApp, Unicorns, Profile } from './pages';
 import { SignIn, SignUp } from './auth';
 import 'normalize.css';
+import Amplify from 'aws-amplify';
+import awsConfig from './amplify-config';
 
-const isAuthenticated = () => false; 
+Amplify.configure(awsConfig);
+let currentUserInfo = null;
+Amplify.Auth.currentUserInfo().then((data) => {
+  currentUserInfo = data;
+}).catch((err) => {
+  console.error(err);
+});
+
+console.log('Amplify Auth', Amplify.Auth);
+console.log('Amplify current user info', Amplify.Auth.currentUserInfo());
+function isAuthenticated() { return currentUserInfo !== null };
 
 const PrivateRoute = ({ component: Component, ...rest }) => (
   <Route

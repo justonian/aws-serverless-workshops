@@ -46,23 +46,69 @@ class SignIn extends React.Component {
     this.setState({ code: e.target.value });
   }
 
-  onSubmitForm(e) {
-    e.preventDefault();
-    console.log('Form Submitted');
-    this.setState({ stage: 1 });
+  async onSubmitForm(e) {
+      e.preventDefault();
+      try {
+          const userObject = await Auth.signIn(
+              this.state.email.replace(/[@.]/g, '|'),
+              this.state.password
+          );
+          console.log('userObject', userObject);
+          if (userObject.challengeName) {
+          // Auth challenges are pending prior to token issuance
+          this.setState({ userObject, stage: 1 });
+          } else {
+          // No remaining auth challenges need to be satisfied
+          const session = await Auth.currentSession();
+          // console.log('Cognito User Access Token:', session.getAccessToken().getJwtToken());
+          console.log('Cognito User Identity Token:', session.getIdToken().getJwtToken());
+          // console.log('Cognito User Refresh Token', session.getRefreshToken().getToken());
+          this.setState({ stage: 0, email: '', password: '', code: '' });
+          this.props.history.replace('/app');
+          }
+      } catch (err) {
+          alert(err.message);
+          console.error('Auth.signIn(): ', err);
+      }
   }
-
-  onSubmitVerification(e) {
-    e.preventDefault();
-    console.log('Verification Submitted');
-    this.setState({ stage: 0, email: '', password: '', code: '' });
-    // Go back home
-    this.props.history.replace('/');
+  
+  async onSubmitVerification(e) {
+      e.preventDefault();
+      try {
+          const data = await Auth.confirmSignIn(
+              this.state.userObject,
+              this.state.code
+          );
+          console.log('Cognito User Data:', data);
+          const session = await Auth.currentSession();
+          // console.log('Cognito User Access Token:', session.getAccessToken().getJwtToken());
+          console.log('Cognito User Identity Token:', session.getIdToken().getJwtToken());
+          // console.log('Cognito User Refresh Token', session.getRefreshToken().getToken());
+          this.setState({ stage: 0, email: '', password: '', code: '' });
+          this.props.history.replace('/app');
+      } catch (err) {
+          alert(err.message);
+          console.error('Auth.confirmSignIn(): ', err);
+      }
   }
 
   isValidEmail(email) {
     var re = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
     return re.test(String(email).toLowerCase());
+  }
+  
+  static async getCurrentSession() {
+    return await Auth.currentSession();
+  }
+
+  static async signOut() {
+    await Auth.signOut();
+    window.location.pathname = '/signin';
+  }
+  
+  static async globalSignOut() {
+    await Auth.signOut({global: true});
+    window.location.pathname = '/signin';
   }
 
   renderSignIn() {

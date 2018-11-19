@@ -55,22 +55,48 @@ class SignUp extends React.Component {
     this.setState({ code: e.target.value });
   }
 
-  onSubmitForm(e) {
-    e.preventDefault();
-    console.log('Form Submitted');
-    this.setState({ stage: 1 });
+  async onSubmitForm(e) {
+  e.preventDefault();
+  try {
+      const params = {
+          username: this.state.email.replace(/[@.]/g, '|'),
+          password: this.state.password,
+          attributes: {
+          email: this.state.email,
+          phone_number: this.state.phone
+          },
+          validationData: []
+      };
+      const data = await Auth.signUp(params);
+      console.log(data);
+      this.setState({ stage: 1 });
+  } catch (err) {
+      if (err.message === "User already exists") {
+          // Setting state to allow user to proceed to enter verification code
+          this.setState({ stage: 1 });
+      } else {
+          if (err.message.indexOf("phone number format") >= 0) {err.message = "Invalid phone number format. Must include country code. Example: +14252345678"}
+          alert(err.message);
+          console.error("Exception from Auth.signUp: ", err);
+          this.setState({ stage: 0, email: '', password: '', confirm: '' });
+      }
   }
-
-  onSubmitVerification(e) {
-    e.preventDefault();
-    console.log('Verification Submitted');
-    this.setState({ 
-      stage: 0, code: '',
-      email: '', phone: '', 
-      password: '', confirm: ''
-    });
-    // Go back to the home page
-    this.props.history.replace('/');
+  }
+  
+  async onSubmitVerification(e) {
+      e.preventDefault();
+      try {
+      const data = await Auth.confirmSignUp(
+          this.state.email.replace(/[@.]/g, '|'),
+          this.state.code
+      );
+      console.log(data);
+      // Go to the sign in page
+      this.props.history.replace('/signin');
+      } catch (err) {
+      alert(err.message);
+      console.error("Exception from Auth.confirmSignUp: ", err);
+      }
   }
 
   isValidEmail(email) {

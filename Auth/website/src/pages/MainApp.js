@@ -16,9 +16,10 @@ import React from 'react';
 import BaseMap from '../components/BaseMap';
 import ESRIMap from '../components/ESRIMap';
 import Amplify from 'aws-amplify';
-import { Auth, API, Logger } from 'aws-amplify';
+import { API, Logger } from 'aws-amplify';
 import awsConfig from '../amplify-config';
 import '../css/ride.css';
+import signIn from '../auth/SignIn';
 
 const apiName = 'WildRydesAPI';
 const apiPath = '/ride';
@@ -38,7 +39,7 @@ class MainApp extends React.Component {
   }
 
   async componentDidMount() {
-    const session = await Auth.currentSession();
+    let session = await signIn.getCurrentSession();
     this.setState({ authToken: session.accessToken.jwtToken });
     this.setState({ idToken: session.idToken.jwtToken });
   }
@@ -50,7 +51,21 @@ class MainApp extends React.Component {
    * @param {Number} longitude
    */
   async getData(pin) {
-    throw new Error('Request a Ride is not implemented');
+    Amplify.Logger.LOG_LEVEL = 'DEBUG';
+    const apiRequest = {
+      body: {
+        PickupLocation: {
+          Longitude: pin.longitude,
+          Latitude: pin.latitude
+        }
+      },
+      headers: {
+        'Authorization': this.state.idToken,
+        'Content-Type': 'application/json'
+      }
+    };
+    logger.info('API Request:', apiRequest);
+    return await API.post(apiName, apiPath, apiRequest);
   }
 
   /**
@@ -59,8 +74,8 @@ class MainApp extends React.Component {
    * @return {Boolean} true if API is configured
    */
   hasApi() {
-    // const api = awsConfig.API.endpoints.filter(v => v.endpoint !== '');                                                   
-    // return (typeof api !== 'undefined');
+    const api = awsConfig.API.endpoints.filter(v => v.endpoint !== '');
+    return (typeof api !== 'undefined');
   }
 
   /**
@@ -147,6 +162,9 @@ class MainApp extends React.Component {
         <div className="info panel panel-default">
           <div className="panel-heading">
             <button id="request" className="btn btn-primary" disabled={!this.state.requestRideEnabled} onClick={() => this.onClick()}>Request</button>
+          </div>
+          <div className="panel-heading">
+            <button id="signout" className="btn btn-primary" onClick={() => signIn.signOut()} >Sign Out</button>
           </div>
           <div className="panel-body">
             <ol id="updates">{updateList}</ol>

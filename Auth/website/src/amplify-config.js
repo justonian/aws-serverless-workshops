@@ -5,22 +5,22 @@
 
 const awsConfig = {
     Auth: {
-        identityPoolId: '', // 'us-east-1:5109bd6b-38ab-4429-89f8-e74d93656224'
-        region: '', // 'us-east-1'
-        userPoolId: '', // 'us-east-1_bgZVERFot'
-        userPoolWebClientId: '', // '4lu058ri9ntkfrv99aa2taeu01'
+        identityPoolId: 'us-east-1:300313f1-26d8-4466-b6dc-96fa2ea98c56', // 'us-east-1:5109bd6b-38ab-4429-89f8-e74d93656224'
+        region: 'us-east-1', // 'us-east-1'
+        userPoolId: 'us-east-1_RhMplxFxs', // 'us-east-1_bgZVERFot'
+        userPoolWebClientId: '6ss6vr6q54se8250u9qq388fej', // '4lu058ri9ntkfrv99aa2taeu01'
     },
     API: {
         endpoints: [
             {
                 name: 'WildRydesAPI',
-                endpoint: '' // https://1ngrgqjt6c.execute-api.us-east-1.amazonaws.com/prod
+                endpoint: 'https://o6np07cnd2.execute-api.us-east-1.amazonaws.com/prod' // https://1ngrgqjt6c.execute-api.us-east-1.amazonaws.com/prod
             }
         ]
     },
     Storage: {
-        bucket: '', //Amazon S3 bucket 'wildrydes-profile-images'
-        region: '', // 'us-east-1'
+        bucket: 'wildrydesapi-profilepicturesbucket-ke6y8rzor6rr', //Amazon S3 bucket 'wildrydes-profile-images'
+        region: 'us-east-1', // 'us-east-1'
     }
 }
 
